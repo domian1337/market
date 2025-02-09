@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F5E6E0;
+            min-height: 100vh;
+        }
+
+        .nav {
+            background-color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .menu-line {
+            width: 24px;
+            height: 2px;
+            background-color: #4b5563;
+            margin: 4px 0;
+        }
+
+        .logout-button {
+            color: #4b5563;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .logout-button:hover {
+            color: #1f2937;
+        }
+
+        .shop-button {
+            color: #4b5563;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .shop-button:hover {
+            color: #1f2937;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            height: 100%;
+            width: 250px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: left 0.3s ease;
+            padding: 4rem 1rem 1rem 1rem;
+            z-index: 99;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #4b5563;
+            text-decoration: none;
+            margin: 0.5rem 0;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2.5rem auto;
+            padding: 1.5rem;
+        }
+
+        .profile-card {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+        }
+
+        td:first-child {
+            width: 33%;
+            color: #4b5563;
+        }
+
+        .edit-input {
+            display: none;
+            padding: 5px;
+            margin: 5px 0;
+        }
+
+        .error-message {
+            color: red;
+            display: none;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        td {
+            padding: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<nav class="nav">
+    <button class="menu-button" onclick="toggleSidebar()">
+        <div class="menu-line"></div>
+        <div class="menu-line"></div>
+        <div class="menu-line"></div>
+    </button>
+    <span>
+    <a href="/shop" class="shop-button">Корзина</a>
+    <a href="/logout" class="logout-button">Выход</a>
+</span>
+</nav>
+
+<div class="sidebar" id="sidebar">
+    <a href="/start">Главная</a>
+    <a href="/support">Поддержка</a>
+    <a href="/contacts">Контакты</a>
+</div>
+
+<div class="container">
+    <form id="profileForm">
+        <table>
+            <tr>
+                <td>Имя:</td>
+                <td>
+                    <span class="display-value" th:text="${personU.name}"></span>
+                    <input type="text" name="name" id="name" class="edit-input" th:value="${personU.name}">
+                </td>
+            </tr>
+            <tr>
+                <td>Фамилия:</td>
+                <td>
+                    <span class="display-value" th:text="${personU.surname}"></span>
+                    <input type="text" name="surname" id="surname" class="edit-input" th:value="${personU.surname}">
+                </td>
+            </tr>
+            <tr>
+                <td>Почта:</td>
+                <td>
+                    <span class="display-value" th:text="${personU.email}"></span>
+                    <input type="email" name="email" id="email" class="edit-input" th:value="${personU.email}">
+                </td>
+            </tr>
+            <tr>
+                <td>Пол:</td>
+                <td>
+                    <span class="display-value" th:text="${personU.gender}"></span>
+                    <select name="gender" id="gender" class="edit-input">
+                        <option value="MAN">MAN</option>
+                        <option value="WOMAN">WOMAN</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Возраст:</td>
+                <td>
+                    <span class="display-value" th:text="${personU.age}"></span>
+                    <input type="number" name="age" id="age" class="edit-input" th:value="${personU.age}">
+                </td>
+            </tr>
+            <tr>
+                <td>Баланс:</td>
+                <td>
+                    <span th:text="${personU.balance + ' ₽'}"></span>
+                </td>
+            </tr>
+        </table>
+
+        <div style="text-align: center;">
+            <button type="button" onclick="toggleEdit()">
+                <span id="editButtonText">Редактировать</span>
+            </button>
+        </div>
+    </form>
+
+    <div id="errorMessage" class="error-message">
+        Произошла ошибка при сохранении данных. Попробуйте еще раз.
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>
+<script>
+    let isEditing = false;
+
+    function toggleEdit() {
+        isEditing = !isEditing;
+        const displayValues = document.querySelectorAll('.display-value');
+        const editInputs = document.querySelectorAll('.edit-input');
+        const editButtonText = document.getElementById('editButtonText');
+
+        displayValues.forEach((value, index) => {
+            value.style.display = isEditing ? 'none' : 'block';
+            if (isEditing) {
+                editInputs[index].value = value.textContent.trim();
+            }
+        });
+
+        editInputs.forEach(input => {
+            input.style.display = isEditing ? 'block' : 'none';
+        });
+
+        editButtonText.textContent = isEditing ? 'Сохранить' : 'Редактировать';
+    }
+
+    $('#editButtonText').click(function () {
+            let modal = $('#profileForm')
+            let user = {
+                name: modal.find('#name').val(),
+                surname: modal.find('#surname').val(),
+                age: modal.find('#age').val(),
+                email: modal.find('#email').val(),
+                gender: modal.find('#gender').val()
+            }
+            $.ajax({
+                url: '/api/v1/marketD/profile/update',
+                type: 'PUT',
+                data: JSON.stringify(user),
+                contentType: "application/json; charset=utf-8",
+                dataType: "html",
+                success: () => {
+                    console.log('Roles updated successfully');
+                    location.reload()
+                },
+                error: (err) => {
+                    alert(err);
+                }
+            })
+    });
+</script>
+</body>
+</html>

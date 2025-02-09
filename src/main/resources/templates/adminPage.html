@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Admin panel</title>
+</head>
+<body>
+<!-- Top Navigation -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <span class="navbar-text">
+            <span th:text="${personU.email}"></span>
+            <span>with role:</span>
+            <span th:each="rolesi: ${personU.roles}">
+                <span th:text="${rolesi.authority}"></span>
+            </span>
+        </span>
+        <form class="d-flex">
+            <span>
+            <a class="btn btn-primary" th:href="@{/logout}" role="button">Logout</a>
+            <a class="btn btn-primary" th:href="@{/start}" role="button">Start</a>
+            </span>
+        </form>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- Left Sidebar -->
+        <div class="col-2 bg-white sidebar">
+
+            <!-- Navigator Tabs -->
+            <div class="nav flex-column nav-pills me-3" role="tablist" aria-orientation="vertical" tabindex="0">
+                <button class="nav-link active" data-bs-toggle="pill"
+                        data-bs-target="#adminTabs" type="button" role="tab" aria-controls="adminTabs"
+                        aria-selected="true">Admin
+                </button>
+                <button class="nav-link" data-bs-toggle="pill"
+                        data-bs-target="#userTabs" type="button" role="tab" aria-controls="userTabs"
+                        aria-selected="true">User
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Tabs -->
+        <div class="col-10 main-content">
+
+
+            <div class="tab-content">
+
+                <!-- Admin Tab -->
+                <div class="tab-pane fade show active" id="adminTabs" role="tabpanel" aria-labelledby="adminTabs"
+                     tabindex="0">
+
+                    <!-- Admin Navigator -->
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link active" data-bs-toggle="tab"
+                                    data-bs-target="#usersTable" type="button" role="tab" aria-controls="usersTable"
+                                    aria-selected="true">Users table
+                            </button>
+                            <button class="nav-link" data-bs-toggle="tab"
+                                    data-bs-target="#newUser" type="button" role="tab"
+                                    aria-controls="newUser" aria-selected="true">New user
+                            </button>
+                            <button class="nav-link" data-bs-toggle="tab"
+                                    data-bs-target="#newCard" type="button" role="tab"
+                                    aria-controls="newCard" aria-selected="true">New card
+                            </button>
+                        </div>
+                    </nav>
+
+
+                    <div class="tab-content mt-3">
+
+                        <!-- Users Table Tab -->
+                        <div id="usersTable" class="tab-pane fade show active">
+                            <h3>All users</h3>
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Age</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Password</th>
+                                    <th>Status</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                <tr th:each="personi: ${persons}">
+                                    <td th:text="${personi.id}"></td>
+                                    <td th:text="${personi.name}"></td>
+                                    <td th:text="${personi.surname}"></td>
+                                    <td th:text="${personi.age}"></td>
+                                    <td th:text="${personi.email}"></td>
+                                    <td th:each="rolesi: ${personi.roles}">
+                                        <span th:text="${rolesi.authority}"></span>
+                                    </td>
+                                    <td th:text="${personi.tpassword}"></td>
+                                    <td th:text="${personi.status}"></td>
+                                    <td>
+                                        <button
+                                                type="button"
+                                                class="btn btn-success btn-sm"
+                                                data-bs-toggle="modal"
+                                                th:data-personId="${personi.id}"
+                                                data-bs-target="#Edit">Edit
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button
+                                                type="button"
+                                                class="btn btn-danger btn-sm"
+                                                data-bs-toggle="modal"
+                                                th:data-personId="${personi.id}"
+                                                data-bs-target="#Delete">Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- New User Tab -->
+                        <div id="newUser" class="tab-pane fade">
+                            <h3>Add new user</h3>
+                            <form class="col-6 mx-auto">
+                                <div class="mb-3">
+                                    <label for="formFile" class="form-label">Выберите фото</label>
+                                    <input class="form-control" type="file" id="formFile">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newName" class="form-label">First name</label>
+                                    <input type="text" class="form-control" id="newName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newSurname" class="form-label">Last name</label>
+                                    <input type="text" class="form-control" id="newSurname" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newAge" class="form-label">Age</label>
+                                    <input type="number" class="form-control" id="newAge" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="newEmail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newPassword" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="newPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newRole" class="form-label">Role</label>
+                                    <select class="form-select" id="newRole" multiple>
+                                        <option th:each="role : ${roles}"
+                                                th:value="${role.id}"
+                                                th:text="${role.role}">Role Name
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newStatus" class="form-label">Status</label>
+                                    <select class="form-select" id="newStatus" required>
+                                        <option value="ACTIVE">ACTIVE</option>
+                                        <option value="BANNED">BANNED</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-success" id="add-button">Add new user</button>
+                            </form>
+                        </div>
+
+                        <!-- New Card Tab -->
+                        <div id="newCard" class="tab-pane fade">
+                            <h3>Add new card</h3>
+                            <form class="col-6 mx-auto">
+                                <div class="mb-3">
+                                    <label for="newTitle" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="newTitle" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newDescription" class="form-label">Description</label>
+                                    <input type="text" class="form-control" id="newDescription" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newCost" class="form-label">Cost</label>
+                                    <input type="number" class="form-control" id="newCost" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newDiscount" class="form-label">Discount</label>
+                                    <input type="number" class="form-control" id="newDiscount" required>
+                                </div>
+                                <button type="button" class="btn btn-success" id="addCard-button">Add new card</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Tab -->
+                <div class="tab-pane fade" id="userTabs" role="tabpanel" aria-labelledby="userTabs" tabindex="0">
+
+                    <!-- User Navigator -->
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab2" role="tablist">
+                            <button class="nav-link active" data-bs-toggle="tab"
+                                    data-bs-target="#userTable" type="button" role="tab" aria-controls="userTable"
+                                    aria-selected="true">User table
+                            </button>
+                        </div>
+                    </nav>
+
+
+                    <div class="tab-content mt-3">
+
+                        <!-- User Table Tab -->
+                        <div id="userTable" class="tab-pane fade show active">
+                            <h3>Your data</h3>
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Age</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Password</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody id="userTableBody">
+                                <tr>
+                                    <td th:text="${personU.name}"></td>
+                                    <td th:text="${personU.surname}"></td>
+                                    <td th:text="${personU.age}"></td>
+                                    <td th:text="${personU.email}"></td>
+                                    <td th:text="${personU.roles}"></td>
+                                    <td th:text="${personU.tpassword}"></td>
+                                    <td th:text="${personU.status}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="Edit" data-bs-backdrop="static" data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="staticBackdropLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Edit user</h1>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <input type="hidden" class="form-control" id="editId" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editName">First name</label>
+                        <input type="text" class="form-control" id="editName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editSurname">Last name</label>
+                        <input type="text" class="form-control" id="editSurname">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editAge">Age</label>
+                        <input type="number" class="form-control" id="editAge">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editEmail">Email</label>
+                        <input type="email" class="form-control" id="editEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" class="form-control" id="password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editRole">Role</label>
+                        <select class="form-select" id="editRole" multiple>
+                                <option th:each="role : ${roles}"
+                                        th:value="${role.id}"
+                                        th:text="${role.role}">Role Name
+                                </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editStatus" class="form-label">Status</label>
+                        <select class="form-select" id="editStatus" required>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="BANNED">BANNED</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close
+                    </button>
+                    <button type="button"
+                            id="edit-button"
+                            class="btn btn-primary">Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade"
+     id="Delete"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="deleteLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete user</h5>
+                <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label" for="deleteId"></label>
+                        <input type="hidden" class="form-control" id="deleteId" readonly/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="deleteName">Name</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="deleteName"
+                                disabled/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="deleteSurname">Surname</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="deleteSurname"
+                                disabled/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="deleteAge">Age</label>
+                        <input type="number"
+                               class="form-control"
+                               id="deleteAge"
+                               disabled/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="deleteEmail">Email</label>
+                        <input type="email"
+                               class="form-control"
+                               id="deleteEmail"
+                               disabled/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="deletePassword">Password</label>
+                        <input type="password"
+                               class="form-control"
+                               id="deletePassword"
+                               disabled/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="deleteRole">Role</label>
+                        <select class="form-select" id="deleteRole" disabled>
+                            <option th:each="role : ${roles}"
+                                    th:value="${role.id}"
+                                    th:text="${role.authority}">Role Name
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deleteStatus" class="form-label">Status</label>
+                        <select class="form-select" id="deleteStatus" disabled>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="BANNED">BANNED</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close
+                    </button>
+                    <button type="button"
+                            class="btn btn-danger"
+                            id="delete-button">Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+<script>
+    $('#Edit').on('shown.bs.modal', function (event) {
+        let button = $(event.relatedTarget) // Button that triggered the modal
+        let personId = button.data('personid') // Extract info from data-* attributes
+
+        if (personId) {
+            $.get({
+                url: '/api/v1/marketD/' + personId,
+                success: (data) => {
+                    let modal = $(this)
+                    modal.find('#editId').val(data.id)
+                    modal.find('#editName').val(data.name)
+                    modal.find('#editSurname').val(data.surname)
+                    modal.find('#editAge').val(data.age)
+                    modal.find('#editEmail').val(data.email)
+                    modal.find('#password').val(data.password)
+                    modal.find('#editRole').val(data.roles)
+                    modal.find('#editStatus').val(data.status)
+                    console.log('Roles updated successfully');
+                },
+                error: (err) => {
+                    console.error('Error updating roles:', err);
+                    alert(err);
+                }
+            });
+        }
+    })
+
+    $('#edit-button').click(function () {
+        let modal = $('#Edit')
+        let user = {
+            name: modal.find('#editName').val(),
+            surname: modal.find('#editSurname').val(),
+            age: modal.find('#editAge').val(),
+            email: modal.find('#editEmail').val(),
+            password: modal.find('#password').val(),
+            roles: modal.find('#editRole').val(),
+            status: modal.find('#editStatus').val(),
+        };
+        if (modal.find('#editId').val()) {
+            user.id = modal.find('#editId').val()
+        }
+        $.ajax({
+            url: '/api/v1/marketD',
+            type: 'PUT',
+            data: JSON.stringify(user),
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: () => {
+                console.log('Roles updated successfully');
+                location.reload()
+            },
+            error: (err) => {
+                alert(err);
+            }
+        })
+    });
+
+    $('#Delete').on('shown.bs.modal', function (event) {
+        let button = $(event.relatedTarget) // Button that triggered the modal
+        let personId = button.data('personid') // Extract info from data-* attributes
+
+        if (personId) {
+            $.get({
+                url: '/api/v1/marketD/' + personId,
+                success: (data) => {
+                    let modal = $(this)
+                    modal.find('#deleteId').val(data.id)
+                    modal.find('#deleteName').val(data.name)
+                    modal.find('#deleteSurname').val(data.surname)
+                    modal.find('#deleteAge').val(data.age)
+                    modal.find('#deleteEmail').val(data.email)
+                    modal.find('#deletePassword').val(data.password)
+                    modal.find('#deleteRole').val(data.roles)
+                    modal.find('#deleteStatus').val(data.status)
+                    console.log('Roles updated successfully');
+                },
+                error: (err) => {
+                    alert(err);
+                }
+            })
+        }
+    });
+
+    $('#delete-button').click(function () {
+        let modal = $('#Delete')
+        let user = {
+            id: modal.find('#deleteId').val(),
+            name: modal.find('#deleteName').val(),
+            surname: modal.find('#deleteSurname').val(),
+            age: modal.find('#deleteAge').val(),
+            email: modal.find('#deleteEmail').val(),
+            password: modal.find('#deletePassword').val(),
+            roles: modal.find('#deleteRole').val(),
+            status: modal.find('#deleteStatus').val(),
+        }
+        $.ajax({
+            url: '/api/v1/marketD',
+            type: 'DELETE',
+            data: JSON.stringify(user),
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: () => {
+                console.log('Roles updated successfully');
+                location.reload()
+            },
+            error: (err) => {
+                alert(err);
+            }
+        })
+    });
+
+    $('#add-button').click(function () {
+        let modal = $('#newUser')
+
+        var selectedRoles = modal.find('#newRole').val().map(function(roleId) {
+            return { id: roleId };
+        });
+
+        let user = {
+            name: modal.find('#newName').val(),
+            surname: modal.find('#newSurname').val(),
+            age: modal.find('#newAge').val(),
+            email: modal.find('#newEmail').val(),
+            password: modal.find('#newPassword').val(),
+            roles: selectedRoles,
+            status: modal.find('#newStatus').val(),
+        }
+        $.ajax({
+            url: '/api/v1/marketD',
+            type: 'POST',
+            data: JSON.stringify(user),
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: () => {
+                console.log('Roles updated successfully');
+                location.reload()
+            },
+            error: (err) => {
+                alert(err);
+            }
+        })
+    });
+
+    $('#addCard-button').click(function () {
+        let modal = $('#newCard')
+        let card = {
+            title: modal.find('#newTitle').val(),
+            description: modal.find('#newDescription').val(),
+            cost: modal.find('#newCost').val(),
+            discount: modal.find('#newDiscount').val(),
+        }
+        $.ajax({
+            url: '/api/v1/marketD/addCard',
+            type: 'POST',
+            data: JSON.stringify(card),
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: () => {
+                console.log('Roles updated successfully');
+                location.reload()
+            },
+            error: (err) => {
+                alert(err);
+            }
+        })
+    });
+</script>
+</body>
+</html>

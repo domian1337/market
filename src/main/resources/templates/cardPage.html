@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточка товара</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .nav {
+            background-color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .menu-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu-icon span {
+            width: 25px;
+            height: 3px;
+            background-color: #333;
+            display: block;
+        }
+
+        .logout-button {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            height: 100%;
+            width: 250px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: left 0.3s ease;
+            padding: 4rem 1rem 1rem 1rem;
+            z-index: 99;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #4b5563;
+            text-decoration: none;
+            margin: 0.5rem 0;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .product-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .product-images {
+            width: 100%;
+            height: 400px;
+            background-color: #f8f8f8;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .product-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .price-block {
+            margin-bottom: 20px;
+        }
+
+        .original-price {
+            font-size: 20px;
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .discounted-price {
+            font-size: 24px;
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .specifications {
+            margin-bottom: 20px;
+        }
+
+        .specifications h3 {
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 5px;
+        }
+
+        .specifications h3::after {
+            content: '+';
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+
+        .specifications.active h3::after {
+            transform: rotate(45deg);
+        }
+
+        .specifications ul {
+            list-style: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .specifications.active ul {
+            max-height: 500px;
+        }
+
+        .specifications li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .shop-button {
+            color: #4b5563;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .add-to-cart {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            display: block;
+            margin: 0 auto 40px;
+        }
+
+        .add-to-cart:hover {
+            background-color: #45a049;
+        }
+
+        /* Стили для слайдера похожих товаров */
+        .similar-products {
+            margin-top: 40px;
+            position: relative;
+            padding: 0 40px;
+        }
+
+        .similar-products h3 {
+            margin-bottom: 20px;
+        }
+
+        .slider-container {
+            overflow: hidden;
+        }
+
+        .slider {
+            display: flex;
+            transition: transform 0.3s ease-out;
+            gap: 20px;
+        }
+
+        .slider-item {
+            min-width: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .slider-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .slider-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            border: 1px solid #ddd;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .slider-button.prev {
+            left: 0;
+        }
+
+        .slider-button.next {
+            right: 0;
+        }
+
+        .slider-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<!--
+<header class="header">
+    <button class="menu-button" onclick="toggleSidebar()">
+        <div class="menu-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    <span>
+    <a href="/logout" class="logout">Выход</a>
+    </span>
+</header>
+-->
+<nav class="nav">
+    <button class="menu-button" onclick="toggleSidebar()">
+        <div class="menu-line"></div>
+        <div class="menu-line"></div>
+        <div class="menu-line"></div>
+    </button>
+    <span>
+    <a href="/shop" class="shop-button">Корзина</a>
+    <a href="/user" class="logout-button">Кабинет</a>
+    <a href="/logout" class="logout-button">Выход</a>
+</span>
+</nav>
+
+<nav class="sidebar" id="sidebar">
+    <a href="/start">Главная</a>
+    <a href="/support">Поддержка</a>
+    <a href="/contacts">Контакты</a>
+</nav>
+
+<main class="product-container">
+    <div class="product-images">
+        <img th:src="${product.imageUrl}" alt="Товар" height="400" width="350">
+    </div>
+
+    <h1 class="product-title" th:text="${product.title}">Название товара</h1>
+
+    <div class="product-description" th:text="${product.description}">
+        Описание товара
+    </div>
+
+    <div class="price-block">
+        <div th:if="${product.discount > 0}" class="original-price" th:text="${product.cost + ' ₽'}">5000 ₽</div>
+        <div class="discounted-price"
+             th:text="${product.discount > 0 ? (product.cost * (1 - product.discount / 100.0))
+              + ' ₽ (-' + product.discount + '%)' : product.cost + ' ₽'}">
+            4000 ₽ (-20%)
+        </div>
+    </div>
+
+    <div class="specifications">
+        <h3>Характеристики</h3>
+        <!--      <ul>
+                  <li th:each="spec : ${product.specifications}"
+                      th:text="${spec.name + ': ' + spec.value}">
+                      Характеристика: значение
+                  </li>
+              </ul>
+              -->
+    </div>
+</main>
+
+<button class="add-to-cart" th:data-article="${product.article}" onclick="sendArticle(this.dataset.article)">Добавить в корзину</button>
+
+<!--
+    <div class="similar-products">
+        <h3>Похожие товары</h3>
+        <div class="slider-container">
+            <div class="slider">
+                <div th:each="similar : ${similarProducts}" class="slider-item">
+                    <img th:src="${similar.imageUrl}" alt="Похожий товар">
+                    <h4 th:text="${similar.name}">Название товара</h4>
+                    <p th:text="${similar.price + ' ₽'}">Цена</p>
+                </div>
+            </div>
+        </div>
+        <button class="slider-button prev" onclick="moveSlider(-1)">❮</button>
+        <button class="slider-button next" onclick="moveSlider(1)">❯</button>
+    </div> -->
+
+<script>
+    //Сохранение товара в корзину пользователя
+    function sendArticle(article) {
+        if (!article) {
+            alert('No article available');
+            return;
+        }
+        $.ajax({
+            url: '/api/v1/marketD/product/' + article,
+            type: 'POST',
+            contentType: 'application/json',
+            success: () => {
+                location.reload()
+            },
+            error: (err) => {
+                alert(err);
+            }
+        });
+    }
+
+    // Закрытие сайдбара при клике вне его
+    document.addEventListener('click', function (event) {
+        const sidebar = document.getElementById('sidebar');
+        const menuButton = document.querySelector('.menu-button');
+
+        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+            sidebar.classList.remove('active');
+        }
+    });
+
+    // Переключение бокового меню
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    // Переключение характеристик
+    document.querySelector('.specifications h3').addEventListener('click', function () {
+        this.parentElement.classList.toggle('active');
+    });
+
+    // Слайдер похожих товаров
+    let currentSlide = 0;
+    const slider = document.querySelector('.slider');
+    const items = document.querySelectorAll('.slider-item');
+    const maxSlides = Math.ceil(items.length / 4) - 1;
+
+    function moveSlider(direction) {
+        currentSlide = Math.max(0, Math.min(maxSlides, currentSlide + direction));
+        const offset = currentSlide * (-880); // 4 items * (200px width + 20px gap)
+        slider.style.transform = `translateX(${offset}px)`;
+
+        // Обновление состояния кнопок
+        document.querySelector('.prev').disabled = currentSlide === 0;
+        document.querySelector('.next').disabled = currentSlide === maxSlides;
+    }
+
+    // Инициализация состояния кнопок
+    moveSlider(0);
+
+    // Функция для отображения цены со скидкой
+    function updatePrice(originalPrice, discount) {
+        const priceBlock = document.querySelector('.price-block');
+
+        if (discount > 0) {
+            const discountedPrice = originalPrice * (1 - discount / 100);
+            priceBlock.innerHTML = `
+                    <div class="original-price">${originalPrice} ₽</div>
+                    <div class="discounted-price">${discountedPrice} ₽ (-${discount}%)</div>
+                `;
+        } else {
+            priceBlock.innerHTML = `
+                    <div class="discounted-price">${originalPrice} ₽</div>
+                `;
+        }
+    }
+</script>
+</body>
+</html>

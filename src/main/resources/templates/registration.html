@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        .nav {
+            background-color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .menu-line {
+            width: 24px;
+            height: 2px;
+            background-color: #4b5563;
+            margin: 4px 0;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            height: 100%;
+            width: 250px;
+            background-color: white;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            padding: 4rem 1rem 1rem 1rem;
+            z-index: 99;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #4b5563;
+            text-decoration: none;
+            margin: 0.5rem 0;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar a:hover {
+            background-color: #f3f4f6;
+        }
+
+        .container {
+            max-width: 28rem;
+            margin: 5rem auto;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .password-requirements {
+            display: none;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .divider {
+            border-top: 1px solid #e5e7eb;
+            margin: 1rem 0;
+            padding-top: 1rem;
+        }
+
+        .login-link {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .login-link a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            color: #2563eb;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+<nav class="nav">
+    <button class="menu-button" onclick="toggleSidebar()">
+        <div class="menu-line"></div>
+        <div class="menu-line"></div>
+        <div class="menu-line"></div>
+    </button>
+</nav>
+
+<div class="sidebar" id="sidebar">
+    <a href="/start">Главная</a>
+    <a href="/support">Поддержка</a>
+    <a href="/contacts">Контакты</a>
+</div>
+
+<div class="container">
+    <form th:method="POST" th:action="@{/registration}" th:object="${person}">
+        <div class="form-group">
+            <label for="Name">Name</label>
+            <input type="text" th:field="${person.name}" id="Name">
+        </div>
+
+        <div class="form-group">
+            <label for="Surname">Surname</label>
+            <input type="text" th:field="${person.surname}" id="Surname">
+        </div>
+
+        <div class="form-group">
+            <label for="Email">Email</label>
+            <input type="email" th:field="${person.email}" id="Email">
+        </div>
+
+        <div class="form-group">
+            <label for="Password">Password</label>
+            <input type="password" th:field="${person.password}" id="Password"
+                   placeholder="Пароль"
+                   required
+                   onfocus="showPasswordRequirements()"
+                   onblur="hidePasswordRequirements()"
+            >
+            <div class="password-requirements" id="passwordRequirements">
+                Не менее 4 символов
+            </div>
+        </div>
+
+        <div class="divider">
+            <p class="login-link">
+                Уже есть аккаунт? <a href="/login">Войти</a>
+            </p>
+        </div>
+
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+</div>
+
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    function showPasswordRequirements() {
+        document.getElementById('passwordRequirements').style.display = 'block';
+    }
+
+    function hidePasswordRequirements() {
+        document.getElementById('passwordRequirements').style.display = 'none';
+    }
+</script>
+</body>
+</html>

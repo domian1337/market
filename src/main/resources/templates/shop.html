@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .cart-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .cart-item img {
+            max-width: 100px;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .item-details {
+            flex-grow: 1;
+            margin: 0 20px;
+        }
+
+        .item-details h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .item-details p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .total-price {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .logout-button {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .nav {
+            background-color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            padding: 5px 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .quantity-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        .remove-button {
+            padding: 8px 15px;
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .remove-button:hover {
+            background-color: #cc0000;
+        }
+
+        .checkout-container {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .checkout-button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .checkout-button:hover {
+            background-color: #45a049;
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .menu-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu-icon span {
+            width: 25px;
+            height: 3px;
+            background-color: #333;
+            display: block;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            height: 100%;
+            width: 250px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: left 0.3s ease;
+            padding: 4rem 1rem 1rem 1rem;
+            z-index: 99;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #4b5563;
+            text-decoration: none;
+            margin: 0.5rem 0;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+<!--
+<header class="header">
+    <button class="menu-button" onclick="toggleSidebar()">
+        <div class="menu-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    <span>
+    <a href="/user" class="logout">Кабинет</a>
+    <a href="/logout" class="logout">Выход</a>
+    </span>
+</header>
+-->
+<nav class="nav">
+    <button class="menu-button" onclick="toggleSidebar()">
+        <div class="menu-line"></div>
+        <div class="menu-line"></div>
+        <div class="menu-line"></div>
+    </button>
+    <span>
+    <a href="/user" class="logout-button">Кабинет</a>
+    <a href="/logout" class="logout-button">Выход</a>
+</span>
+</nav>
+
+<nav class="sidebar" id="sidebar">
+    <a href="/start">Главная</a>
+    <a href="/support">Поддержка</a>
+    <a href="/contacts">Контакты</a>
+</nav>
+
+<div class="cart-container">
+    <h1>Your Shopping Cart</h1>
+    <div th:if="${#lists.isEmpty(products)}" class="empty-cart">
+        <p>Your shopping cart is empty</p>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(products)}">
+        <div th:each="item : ${products}" class="cart-item">
+            <img th:src="${item.imageUrl}" th:alt="${item.title}">
+            <div class="item-details">
+                <h3 th:text="${item.title}">Product Name</h3>
+                <p th:text="${item.description}">Product Description</p>
+                <p>Price: <span th:text="${#numbers.formatDecimal(item.cost, 1, 2)} + ' ₽'">0.00 ₽</span></p>
+            </div>
+            <div class="quantity-controls">
+                <button class="quantity-btn" onclick="updateQuantity(this, 'decrease')"
+                        th:data-product-id="${item.article}">
+                    -
+                </button>
+                <!--         <span th:text="${item.quantity}">1</span> -->
+                <button class="quantity-btn" onclick="updateQuantity(this, 'increase')"
+                        th:data-product-id="${item.article}">
+                    +
+                </button>
+
+                <button class="remove-button" onclick="removeFromCart(this)"
+                        th:data-product-id="${item.article}">Remove
+                </button>
+            </div>
+        </div>
+
+        <div class="total-price">
+            <!-- Total: <span th:text="${#numbers.formatDecimal(totalPrice, 1, 2)} + ' ₽'">0.00 ₽</span> -->
+        </div>
+
+        <div class="checkout-container">
+            <button onclick="proceedToCheckout()" class="checkout-button">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!--
+<script>
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    // Закрытие сайдбара при клике вне его
+    document.addEventListener('click', function (event) {
+        const sidebar = document.getElementById('sidebar');
+        const menuButton = document.querySelector('.menu-button');
+
+        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+            sidebar.classList.remove('active');
+        }
+    });
+
+    function removeFromCart(button) {
+        const productId = button.getAttribute('data-product-id');
+
+        if (!productId) {
+            console.error('Product ID not found');
+            return;
+        }
+
+        $.ajax({
+            url: '/api/v1/marketD/cart/remove',
+            type: 'PATCH',
+            data: {article: productId},
+            success: function (response) {
+// Remove the item from the DOM
+                button.closest('.cart-item').remove();
+// Update total price
+                if (response.totalPrice !== undefined) {
+                    document.querySelector('.total-price span').textContent =
+                        response.totalPrice.toFixed(2) + ' ₽';
+                }
+
+// Show empty cart message if no items left
+                if (document.querySelectorAll('.cart-item').length === 0) {
+                    const emptyCart = document.createElement('div');
+                    emptyCart.className = 'empty-cart';
+                    emptyCart.innerHTML = '<p>Your shopping cart is empty</p>';
+                    document.querySelector('.cart-container').appendChild(emptyCart);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error removing item:', error);
+                alert('Failed to remove item from cart');
+            }
+        });
+    }
+
+    function updateQuantity(button, action) {
+        const productId = button.getAttribute('data-product-id');
+        const quantityElement = button.parentElement.querySelector('span');
+
+        $.ajax({
+            url: '/cart/update',
+            type: 'POST',
+            data: {
+                productId: productId,
+                action: action
+            },
+            success: function (response) {
+                if (response.quantity !== undefined) {
+                    quantityElement.textContent = response.quantity;
+                }
+                if (response.totalPrice !== undefined) {
+                    document.querySelector('.total-price span').textContent =
+                        response.totalPrice.toFixed(2) + ' ₽';
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error updating quantity:', error);
+                alert('Failed to update quantity');
+            }
+        });
+    }
+
+    function proceedToCheckout() {
+// Save cart state if needed
+        $.ajax({
+            url: '/cart/save',
+            type: 'POST',
+            success: function (response) {
+// Redirect to checkout page
+                window.location.href = '/checkout';
+            },
+            error: function (xhr, status, error) {
+                console.error('Error proceeding to checkout:', error);
+                alert('Failed to proceed to checkout');
+            }
+        });
+    }
+
+    // Optional: Add event listener for quantity input validation
+    document.addEventListener('DOMContentLoaded', function () {
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                const value = parseInt(this.value);
+                if (isNaN(value) || value < 1) {
+                    this.value = 1;
+                }
+            });
+        });
+    });
+</script>
+-->
+</body>
+</html>
