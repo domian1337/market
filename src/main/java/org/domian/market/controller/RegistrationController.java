@@ -8,13 +8,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/registration")
-public class Registration {
+@RequestMapping("/registrations")
+public class RegistrationController {
 
     private PersonService personService;
 
     @Autowired
-    public Registration(PersonService personService) {
+    public RegistrationController(PersonService personService) {
         this.personService = personService;
     }
 

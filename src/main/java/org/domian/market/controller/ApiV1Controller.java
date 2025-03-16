@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/marketD")
-public class AController {
+public class ApiV1Controller {
 
     private final PersonService personService;
 
     @Autowired
-    public AController(PersonService personService) {
+    public ApiV1Controller(PersonService personService) {
         this.personService = personService;
     }
 

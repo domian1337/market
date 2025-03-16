@@ -1,4 +1,4 @@
-package org.domian.market.config;
+package org.domian.market.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.domian.market.service.PersonService;
@@ -19,7 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig{
+public class SecurityConfig {
 
     private final PersonService personService;
     private final SuccessUserHandler successUserHandler;

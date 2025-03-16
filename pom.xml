@@ -13,7 +13,7 @@
 	<groupId>org.domian</groupId>
 	<artifactId>market</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>market</name>
 	<description>Market for pet-project</description>
 
